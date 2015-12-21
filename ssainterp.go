@@ -39,7 +39,7 @@ type Interpreter struct {
 }
 
 // Run the interpreter, given some code.
-func Run(code string, extFns []ExtFunc, args []string, output *bytes.Buffer) (*Interpreter, int, error) {
+func Run(code string, extFns []ExtFunc, args []string, output *bytes.Buffer) (interp *Interpreter, exitCode int, error error) {
 	ssai := new(Interpreter)
 	exitCode, err := ssai.run(code, extFns, args, output)
 	if ssai.Panic != nil {

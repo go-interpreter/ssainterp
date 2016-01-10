@@ -17,8 +17,9 @@ import (
 	"syscall"
 	"time"
 
+	"go/types"
+
 	"golang.org/x/tools/go/ssa"
-	"golang.org/x/tools/go/types"
 )
 
 type externalFn func(fr *frame, args []Ivalue) Ivalue

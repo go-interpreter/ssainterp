@@ -3,7 +3,7 @@ package ssainterp_test
 import (
 	"testing"
 
-	"golang.org/x/tools/go/types"
+	"go/types"
 
 	"github.com/go-interpreter/ssainterp"
 	"github.com/go-interpreter/ssainterp/interp"

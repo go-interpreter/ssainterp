@@ -56,7 +56,7 @@ import (
 	"bytes"
 
 	"golang.org/x/tools/go/ssa"
-	"golang.org/x/tools/go/types"
+	"go/types"
 )
 
 type continuation int

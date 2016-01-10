@@ -31,7 +31,7 @@ func main() {
 
 	ioutil.WriteFile("generated.go", []byte(`package interp
 
-import "golang.org/x/tools/go/types"
+import "go/types"
 
 `+fns+`
 func easyConvFunc(desT, srcT types.BasicKind) func(Ivalue) Ivalue {

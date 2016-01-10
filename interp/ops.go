@@ -11,9 +11,10 @@ import (
 	"reflect"
 	"strings"
 
-	"golang.org/x/tools/go/exact"
+	"go/constant"
+	"go/types"
+
 	"golang.org/x/tools/go/ssa"
-	"golang.org/x/tools/go/types"
 )
 
 // If the target program panics, the interpreter panics with this type.
@@ -72,7 +73,7 @@ func (i *interpreter) constIvalue(c *ssa.Const) Ivalue {
 		// TODO(adonovan): eliminate untyped constants from SSA form.
 		switch t.Kind() {
 		case types.Bool, types.UntypedBool:
-			return exact.BoolVal(c.Value)
+			return constant.BoolVal(c.Value)
 		case types.Int, types.UntypedInt:
 			// Assume sizeof(int) is same on host and target.
 			return int(c.Int64())
@@ -109,8 +110,8 @@ func (i *interpreter) constIvalue(c *ssa.Const) Ivalue {
 		case types.Complex128, types.UntypedComplex:
 			return c.Complex128()
 		case types.String, types.UntypedString:
-			if c.Value.Kind() == exact.String {
-				return exact.StringVal(c.Value)
+			if c.Value.Kind() == constant.String {
+				return constant.StringVal(c.Value)
 			}
 			return string(rune(c.Int64()))
 		}

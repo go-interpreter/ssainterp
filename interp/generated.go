@@ -1,6 +1,6 @@
 package interp
 
-import "golang.org/x/tools/go/types"
+import "go/types"
 
 func easyConvToIntFromInt(v Ivalue) Ivalue {
 	return int(v.(int))

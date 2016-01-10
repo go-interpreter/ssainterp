@@ -13,10 +13,11 @@ import (
 	"github.com/go-interpreter/ssainterp/interp"
 	//"./interp"
 
+	"go/types"
+
 	"golang.org/x/tools/go/loader"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/ssa/ssautil"
-	"golang.org/x/tools/go/types"
 )
 
 // Func is the signature of a normal go function

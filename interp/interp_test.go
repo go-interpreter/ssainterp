@@ -16,10 +16,11 @@ import (
 	"testing"
 	"time"
 
+	"go/types"
+
 	"golang.org/x/tools/go/loader"
 	"golang.org/x/tools/go/ssa"
 	"golang.org/x/tools/go/ssa/ssautil"
-	"golang.org/x/tools/go/types"
 
 	// interp "."
 	"github.com/go-interpreter/ssainterp/interp"

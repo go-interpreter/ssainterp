@@ -15,8 +15,9 @@ import (
 	"go/token"
 	"reflect"
 
+	"go/types"
+
 	"golang.org/x/tools/go/ssa"
-	"golang.org/x/tools/go/types"
 )
 
 type opaqueType struct {

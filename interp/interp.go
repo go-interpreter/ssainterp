@@ -49,14 +49,14 @@ package interp
 import (
 	"fmt"
 	"go/token"
+	"io"
 	"os"
 	"reflect"
 	"runtime"
 	"sync"
-	"io"
 
-	"golang.org/x/tools/go/ssa"
 	"go/types"
+	"golang.org/x/tools/go/ssa"
 )
 
 type continuation int
@@ -102,16 +102,17 @@ type interpreter struct {
 
 	runtimeFunc map[uintptr]*ssa.Function // required to avoid using the unsafe package
 
-// CapturedOutput is non-nil, all writes by the interpreted program
-// to file descriptors 1 and 2 will also be written to CapturedOutput.
-//
-// (The $GOROOT/test system requires that the test be considered a
-// failure if "BUG" appears in the combined stdout/stderr output, even
-// if it exits zero.  
-//
-CapturedOutput io.Writer
-capturedOutputMu sync.Mutex
+	callTargetCache map[string]*ssa.Function // speed up 2nd calls to specific funcs
 
+	// CapturedOutput is non-nil, all writes by the interpreted program
+	// to file descriptors 1 and 2 will also be written to CapturedOutput.
+	//
+	// (The $GOROOT/test system requires that the test be considered a
+	// failure if "BUG" appears in the combined stdout/stderr output, even
+	// if it exits zero.
+	//
+	CapturedOutput   io.Writer
+	capturedOutputMu sync.Mutex
 }
 
 type deferred struct {
@@ -810,7 +811,7 @@ func Interpret(mainpkg *ssa.Package, mode Mode, sizes types.Sizes, filename stri
 			return
 		}
 		rec := recover()
-		switch p:=rec.(type) {
+		switch p := rec.(type) {
 		case exitPanic:
 			exitCode = int(p)
 			return
@@ -865,20 +866,27 @@ func (i *interpreter) userStackIfPanic() {
 
 // Call a function in the interpreter's execution context
 func (cont *Context) Call(name string, args []Ivalue) Ivalue {
-	// TODO implement a faster way than itterating over the packages/members
 	fr := &frame{i: cont.Interp}
-	pkgs := cont.Interp.prog.AllPackages()
-	for _, pkg := range pkgs {
-		for _, mem := range pkg.Members {
-			targetFn, isFn := mem.(*ssa.Function)
-			if isFn {
-				if targetFn.String() == name {
-					return call(cont.Interp, fr, token.NoPos, targetFn, args)
+	if cont.Interp.callTargetCache == nil {
+		cont.Interp.callTargetCache = make(map[string]*ssa.Function)
+		pkgs := cont.Interp.prog.AllPackages()
+		for _, pkg := range pkgs {
+			for _, mem := range pkg.Members {
+				targetFn, isFn := mem.(*ssa.Function)
+				if isFn {
+					sname := targetFn.String()
+					if sname == name {
+						cont.Interp.callTargetCache[name] = targetFn
+					}
 				}
 			}
 		}
 	}
-	panic("No interpreter function: " + name)
+	targetFn := cont.Interp.callTargetCache[name]
+	if targetFn == nil {
+		panic("No interpreter function: " + name)
+	}
+	return call(cont.Interp, fr, token.NoPos, targetFn, args)
 }
 
 // deref returns a pointer's element type; otherwise it returns typ.

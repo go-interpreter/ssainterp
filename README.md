@@ -8,7 +8,7 @@ The planned use-case for this interpreter is where there is no access to a Go co
 This code is a work-in-progress.
 It is neither fully working nor properly documented, and is full of security vulnerabilities.
 
-The tests are only known to pass on OSX & Ubuntu. The very simple benchmark suggests this interpreter runs over 1000x slower than compiled code (but faster than the original implementation it was developed from).
+The tests are only known to pass on OSX & Ubuntu. The very simple benchmark suggests this interpreter runs 881x slower than compiled code, but 12x faster than the original implementation it was developed from.
 
 Some ideas for future development were set-out in a [discussion document](https://docs.google.com/document/d/1Hvxf6NMPaCUd-1iqm_968SuHN1Vf8dLZQyHjvPyVE0Q/edit?usp=sharing).
 

@@ -6,9 +6,9 @@
 package ssainterp
 
 import (
-	"bytes"
 	"fmt"
 	"go/build"
+	"io"
 
 	"github.com/go-interpreter/ssainterp/interp"
 	//"./interp"
@@ -40,7 +40,7 @@ type Interpreter struct {
 }
 
 // Run the interpreter, given some code.
-func Run(code string, extFns []ExtFunc, args []string, output *bytes.Buffer) (interp *Interpreter, exitCode int, error error) {
+func Run(code string, extFns []ExtFunc, args []string, output io.Writer) (interp *Interpreter, exitCode int, error error) {
 	ssai := new(Interpreter)
 	exitCode, err := ssai.run(code, extFns, args, output)
 	if ssai.Panic != nil {
@@ -49,7 +49,7 @@ func Run(code string, extFns []ExtFunc, args []string, output *bytes.Buffer) (in
 	return ssai, exitCode, err
 }
 
-func (ssai *Interpreter) run(code string, extFns []ExtFunc, args []string, output *bytes.Buffer) (int, error) {
+func (ssai *Interpreter) run(code string, extFns []ExtFunc, args []string, output io.Writer) (int, error) {
 
 	defer func() {
 		if r := recover(); r != nil {

@@ -53,7 +53,7 @@ import (
 	"reflect"
 	"runtime"
 	"sync"
-	"bytes"
+	"io"
 
 	"golang.org/x/tools/go/ssa"
 	"go/types"
@@ -107,10 +107,9 @@ type interpreter struct {
 //
 // (The $GOROOT/test system requires that the test be considered a
 // failure if "BUG" appears in the combined stdout/stderr output, even
-// if it exits zero.  This is a global variable shared by all
-// interpreters in the same process.)
+// if it exits zero.  
 //
-CapturedOutput *bytes.Buffer
+CapturedOutput io.Writer
 capturedOutputMu sync.Mutex
 
 }
@@ -741,7 +740,7 @@ type Context struct {
 //
 // The SSA program must include the "runtime" package.
 //
-func Interpret(mainpkg *ssa.Package, mode Mode, sizes types.Sizes, filename string, args []string, ext *Externals, output *bytes.Buffer) (context *Context, exitCode int) {
+func Interpret(mainpkg *ssa.Package, mode Mode, sizes types.Sizes, filename string, args []string, ext *Externals, output io.Writer) (context *Context, exitCode int) {
 	if ext == nil {
 		ext = NewExternals()
 	}

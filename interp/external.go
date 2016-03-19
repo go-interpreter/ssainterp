@@ -84,7 +84,8 @@ func init() {
 		"math.Ldexp":                       ext۰math۰Ldexp,
 		"math.Log":                         ext۰math۰Log,
 		"math.Min":                         ext۰math۰Min,
-		"math.Sqrt":                        ext۰math۰Sqrt, // Elliott
+		"math.Sqrt":                        ext۰math۰Sqrt,    // Elliott
+		"math.hasSSE4":                     ext۰math۰hasSSE4, // Elliott
 		"os.runtime_args":                  ext۰os۰runtime_args,
 		"os.runtime_beforeExit":            ext۰os۰runtime_beforeExit,
 		"reflect.New":                      ext۰reflect۰New,
@@ -295,6 +296,10 @@ func ext۰math۰Log(fr *frame, args []Ivalue) Ivalue {
 
 func ext۰math۰Sqrt(fr *frame, args []Ivalue) Ivalue { // Elliott
 	return math.Sqrt(args[0].(float64))
+}
+
+func ext۰math۰hasSSE4(fr *frame, args []Ivalue) Ivalue { // Elliott
+	return false
 }
 
 func ext۰os۰runtime_args(fr *frame, args []Ivalue) Ivalue {

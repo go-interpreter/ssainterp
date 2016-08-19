@@ -15,6 +15,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -108,6 +109,7 @@ func init() {
 		"runtime.Gosched":                  ext۰runtime۰Gosched,
 		"runtime.init":                     ext۰runtime۰init,
 		"runtime.NumCPU":                   ext۰runtime۰NumCPU,
+		"runtime.NumGoroutine":             ext۰runtime۰NumGoroutine,
 		"runtime.ReadMemStats":             ext۰runtime۰ReadMemStats,
 		"runtime.SetFinalizer":             ext۰runtime۰SetFinalizer,
 		"(*runtime.Func).Entry":            ext۰runtime۰Func۰Entry,
@@ -120,8 +122,9 @@ func init() {
 		"sync.runtime_Semacquire":          ext۰sync۰runtime_Semacquire,
 		"sync.runtime_Semrelease":          ext۰sync۰runtime_Semrelease,
 		"sync.runtime_Syncsemcheck":        ext۰sync۰runtime_Syncsemcheck,
-		"sync.runtime_canSpin":             sync۰runtime۰canSpin, // Elliott
-		"sync.runtime_doSpin":              sync۰runtime۰doSpin,  // Elliott
+		"sync.runtime_canSpin":             sync۰runtime۰canSpin,         // Elliott
+		"sync.runtime_doSpin":              sync۰runtime۰doSpin,          // Elliott
+		"sync.runtime_notifyListCheck":     sync۰runtime۰notifyListCheck, // Elliott
 		"sync.runtime_registerPoolCleanup": ext۰sync۰runtime_registerPoolCleanup,
 		"sync/atomic.AddInt32":             ext۰atomic۰AddInt32,
 		"sync/atomic.AddUint32":            ext۰atomic۰AddUint32,
@@ -173,6 +176,16 @@ func sync۰runtime۰canSpin(fr *frame, args []Ivalue) Ivalue { //i int) bool { /
 }
 func sync۰runtime۰doSpin(fr *frame, args []Ivalue) Ivalue { //) { // Elliott
 	runtime.Gosched()
+	return nil
+}
+
+// NumGoroutine returns the number of goroutines that currently exist.
+func ext۰runtime۰NumGoroutine(fr *frame, args []Ivalue) Ivalue { // Elliott
+	return int(atomic.LoadInt32(&fr.i.goroutines))
+}
+
+// Ensure that sync and runtime agree on size of notifyList.
+func sync۰runtime۰notifyListCheck(fr *frame, args []Ivalue) Ivalue { // Elliott
 	return nil
 }
 

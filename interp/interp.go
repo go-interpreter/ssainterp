@@ -54,6 +54,7 @@ import (
 	"reflect"
 	"runtime"
 	"sync"
+	"sync/atomic"
 
 	"go/types"
 	"golang.org/x/tools/go/ssa"
@@ -88,6 +89,7 @@ type interpreter struct {
 	rtypeMethods       methodSet             // the method set of rtype, which implements the reflect.Type interface.
 	runtimeErrorString types.Type            // the runtime.errorString type
 	sizes              types.Sizes           // the effective type-sizing function
+	goroutines         int32                 // atomically updated
 
 	externals *Externals // per-interpreter externals (immutable)
 	/*
@@ -318,11 +320,13 @@ func visitInstr(fr *frame, instr ssa.Instruction) continuation {
 
 	case *ssa.Go:
 		fn, args := prepareCall(fr, &instr.Call)
+		atomic.AddInt32(&fr.i.goroutines, 1)
 		go func() {
 			defer func() {
 				fr.i.userStackIfPanic()
 			}()
 			call(fr.i, nil, instr.Pos(), fn, args)
+			atomic.AddInt32(&fr.i.goroutines, -1)
 		}()
 
 	case *ssa.MakeChan:
@@ -746,10 +750,11 @@ func Interpret(mainpkg *ssa.Package, mode Mode, sizes types.Sizes, filename stri
 		ext = NewExternals()
 	}
 	i := &interpreter{
-		prog:    mainpkg.Prog,
-		globals: make(map[ssa.Value]*Ivalue),
-		mode:    mode,
-		sizes:   sizes,
+		prog:       mainpkg.Prog,
+		globals:    make(map[ssa.Value]*Ivalue),
+		mode:       mode,
+		sizes:      sizes,
+		goroutines: 1,
 
 		//constants: make(map[*ssa.Const]Ivalue),
 		externals:   ext,

@@ -1,3 +1,5 @@
+# NOT WORKING, PLEASE HELP
+
 # ssainterp
 A Golang interpreter, built upon [golang.org/x/tools/go/ssa/interp](https://godoc.org/golang.org/x/tools/go/ssa/interp). That original code contains the comment that "It is not, and will never be, a production-quality Go interpreter.", but that does not mean that it could not be of use in some very limited circumstances.
 

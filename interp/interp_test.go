@@ -251,8 +251,8 @@ func run(t *testing.T, dir, input string, success successPredicate) bool {
 			mainPkg = p
 		}
 	}
-	if mainPkg == nil {
-		testmainPkg := prog.CreateTestMainPackage(initialPkgs...)
+	if mainPkg == nil && len(initialPkgs) == 1 {
+		testmainPkg := prog.CreateTestMainPackage(initialPkgs[0])
 		if testmainPkg == nil {
 			t.Errorf("CreateTestMainPackage(%s) returned nil", mainPkg)
 			return false
